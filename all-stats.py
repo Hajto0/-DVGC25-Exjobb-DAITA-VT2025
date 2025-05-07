@@ -7,7 +7,9 @@ import subprocess
 def process_log_file(log_file):
     """Process each log file to calculate its total size and duration."""
     duration = 0
-    log_size = 0
+    total_log_size = 0
+    sent_bandwidth = 0
+    received_bandwidth = 0
 
     with open(log_file, "r") as f:
         for line in f:
@@ -16,10 +18,15 @@ def process_log_file(log_file):
             time, direction, size = parts
             size = int(size)
 
-            duration = float(time) / (10 ** 9)  # Convert time to seconds (assuming nanoseconds)
-            log_size += size
+            if direction == 's':
+                sent_bandwidth += size
+            else:
+                received_bandwidth += size
 
-    return log_size, duration
+            duration = float(time) / (10 ** 9)  # Convert time to seconds (assuming nanoseconds)
+            total_log_size += size
+
+    return total_log_size, sent_bandwidth, received_bandwidth, duration
 
 def process_server_folders(input_file):
     results = {}
@@ -54,14 +61,17 @@ def process_server_folders(input_file):
             print(f"{server.name:<35} {rf_accuracy}\n") #DEBUG
         except Exception as e:
             print(f"{server.name:<35} ERROR: {e}")
-
-        total_duration = 0
-        total_size = 0
+        
 
         print(f"Calculating metrics for {server.name}\n")
 
+        total_duration = 0
+        total_size = 0
+        total_sent_bandwidth = 0
+        total_received_bandwidth = 0
+
         for url_folder_num in range(50):
-            #print(f"Processing URL#{url_folder_num} on {server}")  #DEBUG
+            print(f"Processing {server.name} URL#{url_folder_num}")  #DEBUG
 
             url_folder = server / str(url_folder_num)
             if not url_folder.is_dir():
@@ -69,35 +79,47 @@ def process_server_folders(input_file):
 
             total_log_duration = 0
             total_log_size = 0
+            total_log_sent_bandwidth = 0
+            total_log_received_bandwidth = 0
 
             # Process log files (from 0.log to 99.log)
             for log_file in url_folder.glob("*.log"):
-                log_size, duration = process_log_file(log_file)
+                log_size, sent_bandwidth, received_bandwidth, duration = process_log_file(log_file)
                 total_log_size += log_size
                 total_log_duration += duration
+                total_log_sent_bandwidth += sent_bandwidth
+                total_log_received_bandwidth += received_bandwidth
 
-            # Calculate average log size and duration for this URL
-            average_log_size = (total_log_size / 100) / 1024**2  # Convert to MiB
+            # Calculate averages for the URL (5 devices * 20 samples = 100)
+            average_log_size = (total_log_size / 100) / 1024**2  # Convert to MiB 
+            average_log_sent_bandwidth = total_log_sent_bandwidth / 100 / 1024**2
+            average_log_received_bandwidth = total_log_received_bandwidth / 100 / 1024**2
             average_log_duration = total_log_duration / 100
 
             total_size += average_log_size
             total_duration += average_log_duration
+            total_sent_bandwidth += average_log_sent_bandwidth
+            total_received_bandwidth += average_log_received_bandwidth
 
-        # Calculate average duration and bandwidth for the server
+        # Calculate averages for the server
         average_duration = total_duration / 50
         average_size = total_size / 50
+        average_sent_bandwidth = total_sent_bandwidth / 50
+        average_received_bandwidth = total_received_bandwidth / 50
 
-        results[server] = (average_duration, average_size, float(df_accuracy), float(rf_accuracy))
+        #results[server] = (average_duration, average_size, average_sent_bandwidth, average_received_bandwidth, float(df_accuracy), float(rf_accuracy))
+        results[server] = (average_duration, average_size, average_sent_bandwidth, average_received_bandwidth, 0, 0)
 
     return results
 
 def print_and_save_results(results, output_path=None):
     print("\n===== SUMMARY =====")
-    print(f"{'Server name':<25} | {'Average Duration (s)':<22} | {'Average Bandwidth (MiB)':<25} | {'DF Accuracy':<12} | {'RF Accuracy':<12}")
-    print("-" * 71)
+    print(f"{'Server name':<25} | {'Defense':<20} | {'Average Duration (s)':<22} | {'Average Bandwidth (MiB)':<25} | {'Average Sent Bandwidth (MiB)':<30} | {'Average Received Bandwidth (MiB)':<30} | {'DF Accuracy':<12} | {'RF Accuracy':<12}")
+    print("-" * 198)
 
-    for server, (average_duration, average_size, df_accuracy, rf_accuracy) in results.items():
-        print(f"{server.name:<25} | {average_duration:<22.2f} | {average_size:<25.2f} | {df_accuracy:<12} | {rf_accuracy:<12}")
+    for server, (average_duration, average_size, average_sent_bandwidth, average_received_bandwidth, df_accuracy, rf_accuracy) in results.items():
+        display_server_name, defense = is_server_defended(server.name)
+        print(f"{display_server_name:<25} | {defense:<20} | {average_duration:<22.2f} | {average_size:<25.2f} | {average_sent_bandwidth:<30.2f} | {average_received_bandwidth:<32.2f} | {df_accuracy:<12} | {rf_accuracy:<12}")
 
 
     if output_path:
@@ -105,22 +127,31 @@ def print_and_save_results(results, output_path=None):
             writer = csv.writer(file)
 
             header = [
-            f"{'Server':<25}",
-            f"{'Average Duration (s)':<22}",
-            f"{'Average Bandwidth (MiB)':<22}",
-            f"{'DF Accuracy':<12}",
-            f"{'RF Accuracy':<12}"
+            f"{'Server'}",
+            f"{'Defense'}",
+            f"{'Average Duration (s)'}",
+            f"{'Average Bandwidth (MiB)'}",
+            f"{'Average Sent Bandwidth (MiB)'}",
+            f"{'Average Received Bandwidth (MiB)'}",
+            f"{'DF Accuracy'}",
+            f"{'RF Accuracy'}"
             ]
             writer.writerow(header)
 
+
+
             # Write each server's data with formatted output for better alignment
-            for server_name, (average_duration, average_size, df_accuracy, rf_accuracy) in results.items():
+            for server_name, (average_duration, average_size, average_sent_bandwidth, average_received_bandwidth, df_accuracy, rf_accuracy) in results.items():
+                display_server_name, defense = is_server_defended(server_name.name)
                 writer.writerow([
-                    f"{str(server_name.name):<20}",
-                    f"{round(average_duration, 2):<22}",
-                    f"{round(average_size, 2):<22}",
-                    f"{round(df_accuracy, 2):<22}",
-                    f"{round(rf_accuracy, 2):<12}"
+                    f"{display_server_name}",
+                    f"{defense}",
+                    f"{round(average_duration, 2)}",
+                    f"{round(average_size, 2)}",
+                    f"{round(average_sent_bandwidth, 2)}",
+                    f"{round(average_received_bandwidth, 2)}",
+                    f"{round(df_accuracy, 2)}",
+                    f"{round(rf_accuracy, 2)}"
                 ])
             print(f"\nSatistics saved to: {output_path}\n")
     else:
@@ -128,8 +159,14 @@ def print_and_save_results(results, output_path=None):
 
     return
 
+def is_server_defended(text):
+    if text.endswith("-ND"):
+        return text[:-3], "Undefended"
+    elif text.endswith("-DT"):
+        return text[:-3], "Daita"
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Process log files and sum bytes transferred.")
+    parser = argparse.ArgumentParser(description="Process log files, sum bytes transferred and runs Wf-attacks.")
     parser.add_argument("input_file", type=str, help="Path to the input directory")
     parser.add_argument("output_file", type=str, help="Path to output CSV file")
 
