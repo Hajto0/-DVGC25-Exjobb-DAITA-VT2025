@@ -162,8 +162,14 @@ def print_and_save_results(results, output_path=None):
 def is_server_defended(text):
     if text.endswith("-ND"):
         return text[:-3], "Undefended"
+    elif text.endswith(" DAITA OFF"):
+        return text[:-10], "Undefended"
     elif text.endswith("-DT"):
         return text[:-3], "Daita"
+    elif text.endswith(" DAITA ON"):
+        return text[:-9], "Daita"
+    else:
+        return text, "unknown"
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Process log files, sum bytes transferred and runs Wf-attacks.")

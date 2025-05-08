@@ -1,0 +1,13 @@
+Server,Defense,Average Duration (s),Average Bandwidth (MiB),Average Sent Bandwidth (MiB),Average Received Bandwidth (MiB),DF Accuracy,RF Accuracy
+ch-zrh-wg-005,Undefended,22.44,0.99,0.07,0.92,0.77,0.7
+ch-zrh-wg-005,Daita,25.65,5.88,3.6,2.29,0.46,0.53
+de-fra-wg-004,Undefended,22.76,1.1,0.07,1.03,0.75,0.71
+de-fra-wg-004,Daita,25.16,5.62,3.32,2.3,0.43,0.64
+gb-lon-wg-008,Undefended,22.8,1.14,0.08,1.06,0.79,0.74
+gb-lon-wg-008,Daita,25.49,5.78,3.63,2.15,0.48,0.51
+nl-ams-wg-002,Undefended,22.13,0.99,0.07,0.92,0.74,0.72
+nl-ams-wg-002,Daita,25.36,5.72,3.35,2.38,0.46,0.6
+se-got-wg-001,Undefended,22.21,0.95,0.07,0.88,0.78,0.73
+se-got-wg-001,Daita,25.36,5.58,3.12,2.47,0.47,0.51
+us-nyc-wg-601,Undefended,25.2,1.45,0.1,1.35,0.73,0.59
+us-nyc-wg-601,Daita,27.31,7.63,4.78,2.85,0.33,0.49
