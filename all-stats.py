@@ -10,6 +10,8 @@ def process_log_file(log_file):
     total_log_size = 0
     sent_bandwidth = 0
     received_bandwidth = 0
+    number_sent = 0
+    number_received = 0
 
     with open(log_file, "r") as f:
         for line in f:
@@ -20,13 +22,15 @@ def process_log_file(log_file):
 
             if direction == 's':
                 sent_bandwidth += size
+                number_sent += 1
             else:
                 received_bandwidth += size
+                number_received += 1
 
             duration = float(time) / (10 ** 9)  # Convert time to seconds (assuming nanoseconds)
             total_log_size += size
 
-    return total_log_size, sent_bandwidth, received_bandwidth, duration
+    return total_log_size, sent_bandwidth, received_bandwidth, duration, number_sent, number_received
 
 def process_server_folders(input_file):
     results = {}
@@ -69,6 +73,8 @@ def process_server_folders(input_file):
         total_size = 0
         total_sent_bandwidth = 0
         total_received_bandwidth = 0
+        total_number_sent = 0
+        total_number_received = 0
 
         for url_folder_num in range(50):
             print(f"Processing {server.name} URL#{url_folder_num}")  #DEBUG
@@ -81,45 +87,58 @@ def process_server_folders(input_file):
             total_log_size = 0
             total_log_sent_bandwidth = 0
             total_log_received_bandwidth = 0
+            total_log_number_sent = 0
+            total_log_number_received = 0
 
             # Process log files (from 0.log to 99.log)
             for log_file in url_folder.glob("*.log"):
-                log_size, sent_bandwidth, received_bandwidth, duration = process_log_file(log_file)
+                log_size, sent_bandwidth, received_bandwidth, duration, number_sent, number_received = process_log_file(log_file)
                 total_log_size += log_size
-                total_log_duration += duration
                 total_log_sent_bandwidth += sent_bandwidth
                 total_log_received_bandwidth += received_bandwidth
+                total_log_duration += duration
+                total_log_number_sent += number_sent
+                total_log_number_received += number_received
+                
+                
 
             # Calculate averages for the URL (5 devices * 20 samples = 100)
             average_log_size = (total_log_size / 100) / 1024**2  # Convert to MiB 
             average_log_sent_bandwidth = total_log_sent_bandwidth / 100 / 1024**2
             average_log_received_bandwidth = total_log_received_bandwidth / 100 / 1024**2
             average_log_duration = total_log_duration / 100
+            average_log_number_received = total_log_number_received / 100
+            average_log_number_sent = total_log_number_sent / 100
 
             total_size += average_log_size
             total_duration += average_log_duration
             total_sent_bandwidth += average_log_sent_bandwidth
             total_received_bandwidth += average_log_received_bandwidth
+            total_number_sent += average_log_number_sent
+            total_number_received += average_log_number_received
 
         # Calculate averages for the server
         average_duration = total_duration / 50
         average_size = total_size / 50
         average_sent_bandwidth = total_sent_bandwidth / 50
         average_received_bandwidth = total_received_bandwidth / 50
+        average_number_sent = total_number_sent / 50
+        average_number_received = total_number_received / 50
 
-        #results[server] = (average_duration, average_size, average_sent_bandwidth, average_received_bandwidth, float(df_accuracy), float(rf_accuracy))
-        results[server] = (average_duration, average_size, average_sent_bandwidth, average_received_bandwidth, 0, 0)
+        results[server] = (average_duration, average_size, average_sent_bandwidth, average_received_bandwidth, average_number_sent, average_number_received, float(df_accuracy), float(rf_accuracy))
+        #results[server] = (average_duration, average_size, average_sent_bandwidth, average_received_bandwidth, average_number_sent, average_number_received, 0, 0)
+        
 
     return results
 
 def print_and_save_results(results, output_path=None):
     print("\n===== SUMMARY =====")
-    print(f"{'Server name':<25} | {'Defense':<20} | {'Average Duration (s)':<22} | {'Average Bandwidth (MiB)':<25} | {'Average Sent Bandwidth (MiB)':<30} | {'Average Received Bandwidth (MiB)':<30} | {'DF Accuracy':<12} | {'RF Accuracy':<12}")
+    print(f"{'Server name':<25} | {'Defense':<20} | {'Average Duration (s)':<22} | {'Average Bandwidth (MiB)':<25} | {'Average Sent Bandwidth (MiB)':<30} | {'Average Received Bandwidth (MiB)':<30} | {'Average Number Sent':<32} | {'Average Number Received':<32} | {'DF Accuracy':<12} | {'RF Accuracy':<12}")
     print("-" * 198)
 
-    for server, (average_duration, average_size, average_sent_bandwidth, average_received_bandwidth, df_accuracy, rf_accuracy) in results.items():
+    for server, (average_duration, average_size, average_sent_bandwidth, average_received_bandwidth, average_number_sent, average_number_received, df_accuracy, rf_accuracy) in results.items():
         display_server_name, defense = is_server_defended(server.name)
-        print(f"{display_server_name:<25} | {defense:<20} | {average_duration:<22.2f} | {average_size:<25.2f} | {average_sent_bandwidth:<30.2f} | {average_received_bandwidth:<32.2f} | {df_accuracy:<12} | {rf_accuracy:<12}")
+        print(f"{display_server_name:<25} | {defense:<20} | {average_duration:<22.2f} | {average_size:<25.2f} | {average_sent_bandwidth:<30.2f} | {average_received_bandwidth:<32.2f} | {int(average_number_sent):<32} | {int(average_number_received):<32} | {df_accuracy:<12} | {rf_accuracy:<12}")
 
 
     if output_path:
@@ -133,6 +152,8 @@ def print_and_save_results(results, output_path=None):
             f"{'Average Bandwidth (MiB)'}",
             f"{'Average Sent Bandwidth (MiB)'}",
             f"{'Average Received Bandwidth (MiB)'}",
+            f"{'Average Number Sent'}", 
+            f"{'Average Number Received'}",
             f"{'DF Accuracy'}",
             f"{'RF Accuracy'}"
             ]
@@ -141,7 +162,7 @@ def print_and_save_results(results, output_path=None):
 
 
             # Write each server's data with formatted output for better alignment
-            for server_name, (average_duration, average_size, average_sent_bandwidth, average_received_bandwidth, df_accuracy, rf_accuracy) in results.items():
+            for server_name, (average_duration, average_size, average_sent_bandwidth, average_received_bandwidth, average_number_sent, average_number_received, df_accuracy, rf_accuracy) in results.items():
                 display_server_name, defense = is_server_defended(server_name.name)
                 writer.writerow([
                     f"{display_server_name}",
@@ -150,6 +171,8 @@ def print_and_save_results(results, output_path=None):
                     f"{round(average_size, 2)}",
                     f"{round(average_sent_bandwidth, 2)}",
                     f"{round(average_received_bandwidth, 2)}",
+                    f"{round(average_number_sent, 2)}",
+                    f"{round(average_number_received, 2)}",
                     f"{round(df_accuracy, 2)}",
                     f"{round(rf_accuracy, 2)}"
                 ])
