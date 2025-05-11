@@ -118,8 +118,7 @@ def parse_packet(packet, first_timestamp, server_name):
         dir = "s" if src_ip.startswith("192.168") else "r"
         timestamp = datetime.fromtimestamp(float(packet.time))
         duration = timestamp - first_timestamp
-        # Convert to nanoseconds, but make sure it's not negative
-        timestamp = max(0, duration.total_seconds() * 1000 * 1000 * 1000)
+        timestamp = max(0, duration.total_seconds() * 1000 * 1000 * 1000)   # Convert to nanoseconds, but make sure it's not negative
 
         return f"{timestamp:.0f},{dir},{packet['IP'].len}"
     return None
