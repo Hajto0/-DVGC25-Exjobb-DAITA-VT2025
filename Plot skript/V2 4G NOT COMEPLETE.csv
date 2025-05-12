@@ -1,0 +1,7 @@
+Server,Defense,Average Duration (s),Average Bandwidth (MiB),Average Sent Bandwidth (MiB),Average Received Bandwidth (MiB),Average Number Sent,Average Number Received,DF Accuracy,RF Accuracy
+nl-ams-wg-002,Daita,27.18,4.29,0.0,4.29,0,2091,0.19,0.48
+nl-ams-wg-002,Undefended,23.89,1.1,0.0,1.1,0,679,0.25,0.68
+se-got-wg-001,Daita,28.38,4.69,0.0,4.69,0,2211,0.12,0.42
+se-got-wg-001,Undefended,23.29,1.15,0.0,1.15,0,725,0.19,0.62
+us-nyc-wg-601,Daita,29.37,4.8,0.0,4.8,0,2254,0.14,0.54
+us-nyc-wg-601,Undefended,26.76,1.53,0.0,1.53,0,998,0.22,0.61
