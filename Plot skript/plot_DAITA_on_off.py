@@ -118,40 +118,40 @@ def main(fname, output_name, split):
                             'Robust Fingerprinting attack accuracy', 'server', 'accuracy', (0.0, 1.0))
 
         create_seaborn_plot(axs[1, 0], server_impact, 'Server', 'bandwidth overhead (x)', 'defense',
-                            'Defense Overhead: Bandwidth', 'server', 'bandwidth overhead (X)', (-0.1, None))
+                            'Defense Overhead: Bandwidth', 'server', 'bandwidth overhead (X)', (None, None))
 
         create_seaborn_plot(axs[1, 1], server_impact, 'Server', 'bandwidth (MiB)', 'defense',
-                            'Total Bandwidth Per Visit', 'server', 'bandwidth used (MiB)', (0, None))
+                            'Total Bandwidth Per Visit', 'server', 'bandwidth used (MiB)', (None, None))
 
         create_seaborn_plot(axs[2, 0], server_impact, 'Server', 'oh latency (x)', 'defense',
                             'Defense Overhead: Duration', 'server', 'duration overhead (X)', (None, None))
 
         create_seaborn_plot(axs[2, 1], server_impact, 'Server', 'duration (sec)', 'defense',
-                            'Total Duration Per Visit', 'server', 'duration (sec)', (-0.1, None))
+                            'Total Duration Per Visit', 'server', 'duration (sec)', (None, None))
 
         create_seaborn_plot(axs[3, 0], server_impact, 'Server', 'bandwidth overhead sent (x)', 'defense',
                             'Defense Overhead: Bandwidth Sent', 'server', 'bw overhead sent (X)', (None, None))
         
         create_seaborn_plot(axs[3, 1], server_impact, 'Server', 'bandwidth sent (MiB)', 'defense',
-                            'Total Bandwidth Sent Per Visit', 'server', 'bandwidth sent (MiB)', (0, None))
+                            'Total Bandwidth Sent Per Visit', 'server', 'bandwidth sent (MiB)', (None, None))
 
         create_seaborn_plot(axs[4, 0], server_impact, 'Server', 'bandwidth overhead recv (x)', 'defense',
-                            'Defense Overhead: Bandwidth Received', 'server', 'bw overhead received (X)', (-0.1, None))
+                            'Defense Overhead: Bandwidth Received', 'server', 'bw overhead received (X)', (None, None))
 
         create_seaborn_plot(axs[4, 1], server_impact, 'Server', 'bandwidth recv (MiB)', 'defense',
-                            'Total Bandwidth Received Per Visit', 'server', 'bandwidth received (MiB)', (0, None))
+                            'Total Bandwidth Received Per Visit', 'server', 'bandwidth received (MiB)', (None, None))
 
         create_seaborn_plot(axs[5, 0], server_impact, 'Server', 'number sent overhead (x)', 'defense',
-                            'Defense Overhead: Number of Packets Sent', 'server', 'packets sent overhead (X)', (-0.1, None))
+                            'Defense Overhead: Number of Packets Sent', 'server', 'packets sent overhead (X)', (None, None))
         
         create_seaborn_plot(axs[5, 1], server_impact, 'Server', 'number sent', 'defense',
-                            'Total Number of Packets Per Visit', 'server', 'packets sent', (0, None))
+                            'Total Number of Packets Per Visit', 'server', 'packets sent', (None, None))
 
         create_seaborn_plot(axs[6, 0], server_impact, 'Server', 'number received overhead (x)', 'defense',
-                            'Defense Overhead: Number of Packets Received', 'server', 'packets received overhead (X)', (-0.1, None))
+                            'Defense Overhead: Number of Packets Received', 'server', 'packets received overhead (X)', (None, None))
 
         create_seaborn_plot(axs[6, 1], server_impact, 'Server', 'number received', 'defense',
-                            'Total Number of Packets Received Per Visit', 'server', 'packets received', (0, None))
+                            'Total Number of Packets Received Per Visit', 'server', 'packets received', (None, None))
 
         # Remove legend titles
         for ax in axs.flat:
