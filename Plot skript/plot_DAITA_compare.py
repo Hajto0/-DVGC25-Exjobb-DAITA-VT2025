@@ -168,7 +168,7 @@ def main(file1, file2, ouput_name, split):
 
         # Plot: Bandwidth Overhead
         create_seaborn_plot(axs[0, 0], plot_data, 'Server', 'bandwidth overhead (x)', 'daita_version',
-                            'Defense Overhead: Bandwidth', 'Server', 'Bandwidth Overhead (x)', (0, 10.0))
+                            'Defense Overhead: Bandwidth', 'Server', 'Bandwidth Overhead (x)', (0, None))
 
         # Plot: Bandwidth Overhead Sent
         create_seaborn_plot(axs[0, 1], plot_data, 'Server', 'bandwidth overhead sent (x)', 'daita_version',
@@ -176,7 +176,7 @@ def main(file1, file2, ouput_name, split):
 
         # Plot: Bandwidth Overhead Received
         create_seaborn_plot(axs[1, 0], plot_data, 'Server', 'bandwidth overhead recv (x)', 'daita_version',
-                            'Defense Overhead: Bandwidth Received', 'Server', 'Bandwidth Overhead Received (x)', (0, 3))
+                            'Defense Overhead: Bandwidth Received', 'Server', 'Bandwidth Overhead Received (x)', (0, None))
 
         # Plot: Duration Overhead
         create_seaborn_plot(axs[1, 1], plot_data, 'Server', 'oh latency (x)', 'daita_version',
@@ -186,7 +186,7 @@ def main(file1, file2, ouput_name, split):
                         'Defense Overhead: Number of Packets Sent', 'Server', 'Number sent overhead (x)', (None, None))
 
         create_seaborn_plot(axs[2, 1], plot_data, 'Server', 'number received overhead (x)', 'daita_version',
-                        'Defense Overhead: Number of Packets Received', 'Server', 'Number received overhead (x)', (None, 2))
+                        'Defense Overhead: Number of Packets Received', 'Server', 'Number received overhead (x)', (None, None))
 
 
         # Remove legend titles
